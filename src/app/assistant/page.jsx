@@ -84,7 +84,7 @@ const LegalAssistantUI = () => {
                     : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
                 }`}
               >
-                What are my rights if I'm stopped by the police?
+                What are my rights if I&apos;m stopped by the police?
               </button>
             ))}
           </div>
@@ -99,6 +99,7 @@ const LegalAssistantUI = () => {
                   : 'bg-gray-200 text-gray-800 focus:ring-gray-500'
               }`}
             />
+            <a href="/signup">
             <button
               onClick={handleModalOpen} // Attach the function here
               className={`cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 transition duration-300 ease-in-out ${
@@ -107,6 +108,8 @@ const LegalAssistantUI = () => {
             >
               <ArrowRight className="w-5 h-5 text-white" />
             </button>
+            </a>
+            
           </div>
         </div>
       </div>
