@@ -111,7 +111,7 @@ const Signin = () => {
           </button>
           {/* Sign Up Link */}
           <div className="text-center mt-4">
-            <span className="text-gray-400">Don't have an account? </span>
+            <span className="text-gray-400">Don&apos;t have an account? </span>
             <a href="/signup" className="text-blue-400 hover:underline">
               Sign up
             </a>

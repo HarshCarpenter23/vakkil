@@ -3,23 +3,12 @@
 import React, { useState } from 'react';
 import { Clock, Maximize2, ArrowRight, Sun, Moon } from 'lucide-react';
 import Image from 'next/image';
-import Modal from './components/LoginModal';
 
 const LegalAssistantUI = () => {
   const [darkMode, setDarkMode] = useState(true);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
-  };
-
-  const [showModal, setShowModal] = useState(false);
-
-  const handleModalOpen = () => {
-    setShowModal(true);
-  };
-
-  const handleModalClose = () => {
-    setShowModal(false);
   };
 
   return (
