@@ -11,6 +11,16 @@ const LegalAssistantUI = () => {
     setDarkMode(!darkMode);
   };
 
+  const [showModal, setShowModal] = useState(false);
+
+  const handleModalOpen = () => {
+    setShowModal(true);
+  };
+
+  const handleModalClose = () => {
+    setShowModal(false);
+  };
+
   return (
     <>
     <div
