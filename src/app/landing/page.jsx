@@ -37,7 +37,7 @@ const LandingPage = () => {
         <div className="flex items-center space-x-4">
           <a href="#" className="text-white hover:text-blue-200">For Business</a>
           <a href="#" className="text-white hover:text-blue-200">FAQ</a>
-          <a href='/signup'>
+          <a href='/assistant'>
             <button className="bg-white text-purple-700 px-4 py-2 rounded-full hover:bg-blue-100 transition duration-300">
                 Get Started →
             </button>
