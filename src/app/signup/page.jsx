@@ -1,9 +1,12 @@
-"use client"
+"use client";
 
 import Image from 'next/image';
 import React, { useState } from 'react';
 import { FaUser, FaEnvelope, FaLock } from 'react-icons/fa';
 import { HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
+import { useRouter } from 'next/navigation';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebase'; // Adjust the path as necessary
 
 const Signup = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -14,10 +17,9 @@ const Signup = () => {
     password: '',
     confirmPassword: '',
   });
-
   const [error, setError] = useState('');
+  const router = useRouter();
 
-  // Toggle password visibility
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
@@ -26,7 +28,6 @@ const Signup = () => {
     setConfirmPasswordVisible(!confirmPasswordVisible);
   };
 
-  // Handle input change
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -34,15 +35,19 @@ const Signup = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;
     }
 
-    setError('');
-    console.log('Form submitted', formData);
+    try {
+      await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      router.push('/account'); // Redirect to the protected page after successful sign-up
+    } catch (error) {
+      setError('Error creating account');
+    }
   };
 
   return (
@@ -61,10 +66,10 @@ const Signup = () => {
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <Image
-          className="h-20"
-          src="/sword_of_law.png" alt="logo" 
-          width={80}
-          height={80}
+            className="h-20"
+            src="/sword_of_law.png" alt="logo" 
+            width={80}
+            height={80}
           />
         </div>
         {/* Title */}
@@ -83,6 +88,7 @@ const Signup = () => {
               className="w-full py-2 pl-10 pr-3 bg-gray-700 text-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={formData.username}
               onChange={handleChange}
+              required
             />
           </div>
           {/* Email */}
@@ -95,6 +101,7 @@ const Signup = () => {
               className="w-full py-2 pl-10 pr-3 bg-gray-700 text-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={formData.email}
               onChange={handleChange}
+              required
             />
           </div>
           {/* Password */}
@@ -107,6 +114,7 @@ const Signup = () => {
               className="w-full py-2 pl-10 pr-10 bg-gray-700 text-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={formData.password}
               onChange={handleChange}
+              required
             />
             {passwordVisible ? (
               <HiOutlineEyeOff
@@ -130,6 +138,7 @@ const Signup = () => {
               className="w-full py-2 pl-10 pr-10 bg-gray-700 text-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={formData.confirmPassword}
               onChange={handleChange}
+              required
             />
             {confirmPasswordVisible ? (
               <HiOutlineEyeOff
