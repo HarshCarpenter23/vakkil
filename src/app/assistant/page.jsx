@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Clock, Maximize2, ArrowRight, Sun, Moon } from 'lucide-react';
 import Image from 'next/image';
+import withAuth from '../components/withAuth';
 
 const LegalAssistantUI = () => {
   const [darkMode, setDarkMode] = useState(true);
@@ -124,4 +125,4 @@ const LegalAssistantUI = () => {
   );
 };
 
-export default LegalAssistantUI;
+export default withAuth(LegalAssistantUI);
