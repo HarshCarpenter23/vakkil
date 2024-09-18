@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import useAuth from '../hooks/useAuth';
 
 const withAuth = (WrappedComponent) => {
-  return (props) => {
+  const ComponentWithAuth = (props) => {
     const { isAuthenticated, loading } = useAuth();
     const router = useRouter();
 
@@ -24,6 +24,11 @@ const withAuth = (WrappedComponent) => {
 
     return <WrappedComponent {...props} />;
   };
+
+  // Set a display name for easier debugging
+  ComponentWithAuth.displayName = `WithAuth(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;
+
+  return ComponentWithAuth;
 };
 
 export default withAuth;
