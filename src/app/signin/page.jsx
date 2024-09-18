@@ -11,6 +11,7 @@ import { toast } from 'react-toastify';
 import Image from 'next/image';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
 import { HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
+import axios from 'axios'; // Import axios to make API calls
 
 const Signin = () => {
   const [email, setEmail] = useState('');
@@ -26,7 +27,15 @@ const Signin = () => {
   const handleEmailSignIn = async (e) => {
     e.preventDefault();
     try {
+      // Sign in with email and password
       await signInWithEmailAndPassword(auth, email, password);
+      
+      // Get the ID token
+      const idToken = await auth.currentUser.getIdToken();
+
+      // Send the token to the backend
+      await sendTokenToBackend(idToken);
+
       router.push('/assistant');
     } catch (e) {
       setError(e.message);
@@ -36,11 +45,42 @@ const Signin = () => {
 
   const handleGoogleSignIn = async () => {
     try {
+      // Sign in with Google
       await signInWithPopup(auth, googleProvider);
+      
+      // Get the ID token
+      const idToken = await auth.currentUser.getIdToken();
+
+      // Send the token to the backend
+      await sendTokenToBackend(idToken);
+
       router.push('/assistant');
     } catch (e) {
       setError(e.message);
       toast.error(e.message);
+    }
+  };
+
+  // Function to send the token to the backend
+  const sendTokenToBackend = async (idToken) => {
+    try {
+      // Sample payload to send to the backend
+      const payload = {
+        user_message: 'Sample user message',
+        assistant_response: 'Sample assistant response',
+      };
+
+      // Send the token and payload to the backend
+      const response = await axios.post('http://localhost:5000/api/store-chat', payload, {
+        headers: {
+          'Authorization': `Bearer ${idToken}`, // Send the token in the Authorization header
+        },
+      });
+
+      console.log('Response from backend:', response.data);
+    } catch (error) {
+      console.error('Error sending token to backend:', error);
+      toast.error('Failed to send data to backend');
     }
   };
 
