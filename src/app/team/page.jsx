@@ -33,7 +33,7 @@ const teamData = {
 
 const TeamMember = ({ name, role, image }) => (
   <div className="flex flex-col items-center text-center transition-transform transform hover:scale-105 hover:shadow-lg p-4 rounded-lg">
-    <div className="w-32 h-32 relative rounded-full overflow-hidden">
+    <div className="w-24 h-24 sm:w-32 sm:h-32 relative rounded-full overflow-hidden">
       <Image 
         src={image} 
         alt={name} 
@@ -48,7 +48,7 @@ const TeamMember = ({ name, role, image }) => (
 
 const TrailblazingLeadership = ({ members }) => (
   <div className="mb-8">
-    <div className="grid grid-cols-3 gap-6 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
       {members.slice(0, 3).map((member, index) => (
         <TeamMember key={index} {...member} />
       ))}
@@ -67,7 +67,7 @@ const TrailblazingLeadership = ({ members }) => (
 );
 
 const StudentLeadership = ({ members }) => (
-  <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
     {members.map((member, index) => (
       <TeamMember key={index} {...member} />
     ))}
@@ -76,18 +76,18 @@ const StudentLeadership = ({ members }) => (
 
 const TeamPage = () => {
   return (
-    <div className="p-10 font-roboto text-center bg-gradient-to-br from-[#507687] via-[#16325B] to-[#507687] text-[#ededed] min-h-screen">
+    <div className="p-4 sm:p-10 font-roboto text-center bg-gradient-to-br from-[#507687] via-[#16325B] to-[#507687] text-[#ededed] min-h-screen">
       <Head>
         <title>Our Team</title>
         <meta name="description" content="Meet our dedicated team members" />
       </Head>
-      <h1 className="text-4xl font-extrabold mt-10 mb-14">Meet Our Team</h1>
+      <h1 className="text-3xl sm:text-4xl font-extrabold mt-10 mb-14">Meet Our Team</h1>
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-8 pb-2 border-b-2 border-gray-300">Trailblazing Leadership</h2>
+        <h2 className="text-xl sm:text-2xl font-semibold mb-8 pb-2 border-b-2 border-gray-300">Trailblazing Leadership</h2>
         <TrailblazingLeadership members={teamData.trailblazingLeadership} />
       </section>
       <section>
-        <h2 className="text-2xl font-semibold mb-6 pb-2 border-b-2 border-gray-300">Student Leadership</h2>
+        <h2 className="text-xl sm:text-2xl font-semibold mb-6 pb-2 border-b-2 border-gray-300">Student Leadership</h2>
         <StudentLeadership members={teamData.studentLeadership} />
       </section>
     </div>

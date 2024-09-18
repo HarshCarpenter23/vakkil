@@ -200,4 +200,4 @@ const LegalAssistantUI = () => {
   );
 };
 
-export default withAuth(LegalAssistantUI);
+export default LegalAssistantUI;
