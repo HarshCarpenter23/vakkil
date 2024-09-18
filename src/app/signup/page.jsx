@@ -1,22 +1,20 @@
-"use client";
+'use client';
 
-import Image from 'next/image';
 import React, { useState } from 'react';
-import { FaUser, FaEnvelope, FaLock } from 'react-icons/fa';
-import { HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase'; // Adjust the path as necessary
+import { getAuth, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider } from 'firebase/auth';
+import GoogleButton from 'react-google-button';
+import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
+import Image from 'next/image';
+import { FaEnvelope, FaLock } from 'react-icons/fa';
+import { HiOutlineEye, HiOutlineEyeOff } from 'react-icons/hi';
 
-const Signup = () => {
+const Signin = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  });
   const [error, setError] = useState('');
   const router = useRouter();
 
@@ -24,29 +22,24 @@ const Signup = () => {
     setPasswordVisible(!passwordVisible);
   };
 
-  const toggleConfirmPasswordVisibility = () => {
-    setConfirmPasswordVisible(!confirmPasswordVisible);
-  };
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = async (e) => {
+  const handleEmailSignIn = async (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
     try {
-      await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-      router.push('/account'); // Redirect to the protected page after successful sign-up
-    } catch (error) {
-      setError('Error creating account');
+      await signInWithEmailAndPassword(getAuth(), email, password);
+      router.push('/assistant');
+    } catch (e) {
+      setError(e.message);
+      toast.error(e.message);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithPopup(getAuth(), new GoogleAuthProvider());
+      router.push('/assistant');
+    } catch (e) {
+      setError(e.message);
+      toast.error(e.message);
     }
   };
 
@@ -74,33 +67,19 @@ const Signup = () => {
         </div>
         {/* Title */}
         <h2 className="text-2xl font-semibold text-center text-gray-300 mb-6">
-          Create Your Account
+          Sign In to Your Account
         </h2>
         {/* Form */}
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          {/* Username */}
-          <div className="relative">
-            <FaUser className="absolute left-3 top-3 text-gray-400" />
-            <input
-              type="text"
-              name="username"
-              placeholder="Username"
-              className="w-full py-2 pl-10 pr-3 bg-gray-700 text-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={formData.username}
-              onChange={handleChange}
-              required
-            />
-          </div>
+        <form className="space-y-4" onSubmit={handleEmailSignIn}>
           {/* Email */}
           <div className="relative">
             <FaEnvelope className="absolute left-3 top-3 text-gray-400" />
             <input
               type="email"
-              name="email"
               placeholder="Email"
               className="w-full py-2 pl-10 pr-3 bg-gray-700 text-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={formData.email}
-              onChange={handleChange}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
@@ -109,11 +88,10 @@ const Signup = () => {
             <FaLock className="absolute left-3 top-3 text-gray-400" />
             <input
               type={passwordVisible ? 'text' : 'password'}
-              name="password"
               placeholder="Password"
               className="w-full py-2 pl-10 pr-10 bg-gray-700 text-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={formData.password}
-              onChange={handleChange}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
             {passwordVisible ? (
@@ -128,54 +106,43 @@ const Signup = () => {
               />
             )}
           </div>
-          {/* Confirm Password */}
-          <div className="relative">
-            <FaLock className="absolute left-3 top-3 text-gray-400" />
-            <input
-              type={confirmPasswordVisible ? 'text' : 'password'}
-              name="confirmPassword"
-              placeholder="Confirm Password"
-              className="w-full py-2 pl-10 pr-10 bg-gray-700 text-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-            />
-            {confirmPasswordVisible ? (
-              <HiOutlineEyeOff
-                className="absolute right-3 top-3 text-gray-400 cursor-pointer"
-                onClick={toggleConfirmPasswordVisibility}
-              />
-            ) : (
-              <HiOutlineEye
-                className="absolute right-3 top-3 text-gray-400 cursor-pointer"
-                onClick={toggleConfirmPasswordVisibility}
-              />
-            )}
-          </div>
           {/* Error Message */}
           {error && (
             <div className="text-red-500 text-sm mb-4">
               {error}
             </div>
           )}
-          {/* Sign Up Button */}
+          {/* Sign In Button */}
           <button
             type="submit"
             className="w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300"
           >
-            SIGN UP
+            SIGN IN
           </button>
-          {/* Sign In Link */}
+          {/* Sign Up Link */}
           <div className="text-center mt-4">
-            <span className="text-gray-400">Have an account? </span>
-            <a href="/signin" className="text-blue-400 hover:underline">
-              Sign in
+            <span className="text-gray-400">Don&apos;t have an account? </span>
+            <a href="/signup" className="text-blue-400 hover:underline">
+              Sign up
             </a>
           </div>
+          {/* Forgot Password Link */}
+          <div className="text-center mt-4">
+            <span className="text-gray-400 cursor-pointer hover:text-blue-400" onClick={() => router.push('/reset')}>
+              Forgot Password?
+            </span>
+          </div>
         </form>
+        {/* Google Sign In Button */}
+        <div className="flex justify-center mt-6">
+          <div>
+            <h4 className="text-center mb-3 text-gray-300">OR</h4>
+            <GoogleButton onClick={handleGoogleSignIn} />
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-export default Signup;
+export default Signin;

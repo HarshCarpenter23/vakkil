@@ -1,36 +1,48 @@
 "use client";
 
 import React, { useState } from 'react';
+import axios from 'axios';
 import { Clock, Maximize2, ArrowRight, Sun, Moon } from 'lucide-react';
 import Image from 'next/image';
+import ReactMarkdown from 'react-markdown';
 import withAuth from '../components/withAuth';
 
 const LegalAssistantUI = () => {
   const [darkMode, setDarkMode] = useState(true);
+  const [query, setQuery] = useState('');
+  const [chatHistory, setChatHistory] = useState([]);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   };
 
-  const [showModal, setShowModal] = useState(false);
+  const handleQuerySubmit = async () => {
+    if (!query.trim()) return;
 
-  const handleModalOpen = () => {
-    setShowModal(true);
-  };
+    try {
+      // Add user message to chat history
+      setChatHistory(prev => [...prev, { type: 'user', content: query }]);
 
-  const handleModalClose = () => {
-    setShowModal(false);
+      // Make a POST request to the Next.js API route
+      const res = await axios.post('/api/proxy', {
+        instruction: query,
+      });
+
+      // Add assistant response to chat history
+      setChatHistory(prev => [...prev, { type: 'assistant', content: res.data.response }]);
+
+      // Clear the input
+      setQuery('');
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setChatHistory(prev => [...prev, { type: 'error', content: 'An error occurred. Please try again.' }]);
+    }
   };
 
   return (
-    <>
-    <div
-      className={`min-h-screen flex items-center justify-around p-4 transition-colors duration-300 ${
-        darkMode
-          ? 'bg-gradient-to-br from-[#507687] via-[#16325B] to-[#507687]'
-          : 'bg-gradient-to-br from-[#FFFFFF] via-[#E0E0E0] to-[#FFFFFF]'
-      }`}
-    >
+    <div className={`min-h-screen flex items-center justify-around p-4 transition-colors duration-300 ${
+      darkMode ? 'bg-gradient-to-br from-[#507687] via-[#16325B] to-[#507687]' : 'bg-gradient-to-br from-[#FFFFFF] via-[#E0E0E0] to-[#FFFFFF]'
+    }`}>
       <div className="relative w-full max-w-2xl">
         {/* Left sidebar */}
         <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full mr-4 p-2 space-y-4">
@@ -40,26 +52,15 @@ const LegalAssistantUI = () => {
           <button className="block p-2 hover:bg-blue-700 rounded">
             <Maximize2 className={`w-6 h-6 ${darkMode ? 'text-white' : 'text-gray-800'}`} />
           </button>
-          <button
-            onClick={toggleDarkMode}
-            className="block p-2 hover:bg-blue-700 rounded"
-          >
-            {darkMode ? (
-              <Sun className="w-6 h-6 text-white" />
-            ) : (
-              <Moon className="w-6 h-6 text-gray-800" />
-            )}
+          <button onClick={toggleDarkMode} className="block p-2 hover:bg-blue-700 rounded">
+            {darkMode ? <Sun className="w-6 h-6 text-white" /> : <Moon className="w-6 h-6 text-gray-800" />}
           </button>
         </div>
 
         {/* Main card */}
-        <div
-          className={`rounded-3xl p-8 shadow-lg transition-colors duration-300 ${
-            darkMode
-              ? 'bg-[#1F2A5C] bg-opacity-57 border border-[#1F2A5C]'
-              : 'bg-white border border-gray-300'
-          }`}
-        >
+        <div className={`rounded-3xl p-8 shadow-lg transition-colors duration-300 ${
+          darkMode ? 'bg-[#1F2A5C] bg-opacity-57 border border-[#1F2A5C]' : 'bg-white border border-gray-300'
+        }`}>
           <div className="flex flex-col items-center mb-8">
             <Image 
               src="/sword_of_law.png" 
@@ -74,54 +75,72 @@ const LegalAssistantUI = () => {
             </h1>
           </div>
 
-          <div className="space-y-4 mb-8">
-            {[1, 2, 3].map((i) => (
-              <button
-                key={i}
-                className={`w-full py-3 px-4 rounded-lg text-sm transition duration-300 ease-in-out ${
-                  darkMode
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
-                }`}
-              >
-                What are my rights if I&apos;m stopped by the police?
-              </button>
+          {/* Chat history */}
+          <div className={`mb-8 p-4 rounded-lg ${darkMode ? 'bg-blue-900' : 'bg-gray-100'} max-h-64 overflow-y-auto`}>
+            {chatHistory.map((message, index) => (
+              <div key={index} className={`mb-4 ${message.type === 'user' ? 'text-right' : 'text-left'}`}>
+                <div className={`inline-block p-3 rounded-lg max-w-[80%] ${message.type === 'user' 
+                    ? (darkMode ? 'bg-blue-600 text-white' : 'bg-blue-200 text-gray-800') 
+                    : (darkMode ? 'bg-gray-700 text-white' : 'bg-gray-300 text-gray-800')
+                }`}>
+                  {message.type === 'assistant' ? (
+                    <ReactMarkdown className="text-sm markdown-content">
+                      {message.content}
+                    </ReactMarkdown>
+                  ) : (
+                    <p className="text-sm">{message.content}</p>
+                  )}
+                </div>
+              </div>
             ))}
           </div>
 
-          <div className="relative">
+          {/* Input area */}
+          <div className="relative mb-8">
             <input
               type="text"
               placeholder="Enter Your Query"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleQuerySubmit()}
               className={`w-full rounded-full py-3 pl-6 pr-12 focus:outline-none focus:ring-2 ${
                 darkMode
                   ? 'bg-gray-100 text-gray-800 focus:ring-blue-500'
                   : 'bg-gray-200 text-gray-800 focus:ring-gray-500'
               }`}
             />
-            <a href="/signup">
             <button
-              onClick={handleModalOpen} // Attach the function here
+              onClick={handleQuerySubmit}
               className={`cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 transition duration-300 ease-in-out ${
                 darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-500 hover:bg-gray-600'
               }`}
             >
               <ArrowRight className="w-5 h-5 text-white" />
             </button>
-            </a>
-            
+          </div>
+
+          {/* Suggestion buttons */}
+          <div className="space-y-4">
+            {['What are my rights if I\'m stopped by the police?', 'How do I file for bankruptcy?', 'What is the process for getting a divorce?'].map((suggestion, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  setQuery(suggestion);
+                  handleQuerySubmit();
+                }}
+                className={`w-full py-3 px-4 rounded-lg text-sm transition duration-300 ease-in-out ${
+                  darkMode
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                    : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+                }`}
+              >
+                {suggestion}
+              </button>
+            ))}
           </div>
         </div>
       </div>
     </div>
-
-    {/* <Modal isOpen={showModal} onClose={handleModalClose}>
-        <h2 className="text-lg font-bold mb-4">Modal Title</h2>
-        <p className="mb-6">This is the content of your modal.</p>
-        <button onClick={handleModalClose} className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Close</button>
-    </Modal> */}
-
-    </>
   );
 };
 

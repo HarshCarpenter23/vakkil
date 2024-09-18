@@ -103,7 +103,7 @@ const LandingPage = () => {
       <main className="container mx-auto flex flex-col lg:flex-row items-center justify-around mt-10 lg:mt-20 px-4 relative z-10">
         <div className="max-w-2xl text-center lg:text-left">
           <h1 className="text-5xl sm:text-7xl font-bold mb-6">
-            <GradientText>Vakkil</GradientText>
+            <GradientText>Vakkil - BOT</GradientText>
           </h1>
           <div className="space-y-2">
             {[
